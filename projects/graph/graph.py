@@ -8,6 +8,7 @@ class Graph:
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
     def __init__(self):
         self.vertices = {}
+        self.visited = set()
 
     def add_vertex(self, vertex_id):
         """
@@ -84,7 +85,15 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        current_node = starting_vertex
+        if current_node in self.visited:
+            return
+        self.visited.add(current_node)
+        neighbors = self.get_neighbors(current_node)
+        print(current_node)
+
+        for neighbor in neighbors:
+            self.dft_recursive(neighbor)
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -154,7 +163,7 @@ if __name__ == '__main__':
         1, 2, 4, 3, 7, 6, 5
         1, 2, 4, 3, 7, 5, 6
     '''
-    graph.bft(1)
+    # graph.bft(1)
 
     '''
     Valid DFT paths:
@@ -163,8 +172,8 @@ if __name__ == '__main__':
         1, 2, 4, 7, 6, 3, 5
         1, 2, 4, 6, 3, 5, 7
     '''
-    graph.dft(1)
-    # graph.dft_recursive(1)
+    # graph.dft(1)
+    graph.dft_recursive(1)
 
     # '''
     # Valid BFS path:
