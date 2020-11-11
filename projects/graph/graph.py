@@ -31,21 +31,51 @@ class Graph:
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        bft_queue = Queue()
+        visited = set()
+
+        bft_queue.enqueue(starting_vertex)
+
+        while bft_queue.size() > 0:
+            current_node = bft_queue.dequeue()
+
+            if current_node not in visited:
+                visited.add(current_node)
+                print(current_node)
+
+                neighbors = self.get_neighbors(current_node)
+
+                for neighbor in neighbors:
+                    bft_queue.enqueue(neighbor)
 
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        dft_stack = Stack()
+        visited = set()
+
+        dft_stack.push(starting_vertex)
+
+        while dft_stack.size() > 0:
+            current_node = dft_stack.pop()
+
+            if current_node not in visited:
+                visited.add(current_node)
+                print(current_node)
+
+                neighbors = self.get_neighbors(current_node)
+
+                for neighbor in neighbors:
+                    dft_stack.push(neighbor)
 
     def dft_recursive(self, starting_vertex):
         """
@@ -124,16 +154,16 @@ if __name__ == '__main__':
         1, 2, 4, 3, 7, 6, 5
         1, 2, 4, 3, 7, 5, 6
     '''
-    # graph.bft(1)
+    graph.bft(1)
 
-    # '''
-    # Valid DFT paths:
-    #     1, 2, 3, 5, 4, 6, 7
-    #     1, 2, 3, 5, 4, 7, 6
-    #     1, 2, 4, 7, 6, 3, 5
-    #     1, 2, 4, 6, 3, 5, 7
-    # '''
-    # graph.dft(1)
+    '''
+    Valid DFT paths:
+        1, 2, 3, 5, 4, 6, 7
+        1, 2, 3, 5, 4, 7, 6
+        1, 2, 4, 7, 6, 3, 5
+        1, 2, 4, 6, 3, 5, 7
+    '''
+    graph.dft(1)
     # graph.dft_recursive(1)
 
     # '''
