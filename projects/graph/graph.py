@@ -172,7 +172,7 @@ class Graph:
 
         for neighbor in neighbors:
             current_path.append(neighbor)
-            self.dft_recursive(neighbor)
+            self.dfs_recursive(neighbor, destination_vertex)
 
 
 if __name__ == '__main__':
