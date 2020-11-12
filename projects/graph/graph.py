@@ -161,7 +161,19 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        current_path = list(starting_vertex)
+        current_node = current_path[-1]
+        if current_node in self.visited:
+            return
+        if current_node == destination_vertex:
+            return current_path
+        self.visited.add(current_node)
+        neighbors = self.get_neighbors(current_node)
+
+        for neighbor in neighbors:
+            current_path.append(neighbor)
+            self.dft_recursive(neighbor)
+
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
