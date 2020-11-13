@@ -161,7 +161,7 @@ class Graph:
 
         This should be done using recursion.
         """
-        current_path = list(starting_vertex)
+        current_path = ([starting_vertex])
         current_node = current_path[-1]
         if current_node in self.visited:
             return
