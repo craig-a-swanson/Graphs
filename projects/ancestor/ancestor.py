@@ -1,4 +1,11 @@
 
+def get_parents(ancestors, node):
+    parents = set()
+    for child in ancestors:
+        if child[1] == node:
+            parents.add(child[0])
+    return parents
+
 def earliest_ancestor(ancestors, starting_node):
     pass
 
