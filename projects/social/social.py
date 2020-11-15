@@ -1,3 +1,5 @@
+import random
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -42,11 +44,30 @@ class SocialGraph:
         self.last_id = 0
         self.users = {}
         self.friendships = {}
-        # !!!! IMPLEMENT ME
 
         # Add users
+        for i in range(0, num_users):
+            self.add_user(f"User {i}")
 
         # Create friendships
+        # Generate all possible friendships
+        # Avoid duplicate friendships
+        possible_friendships = []
+        for user_id in self.users:
+            for friend_id in range(user_id + 1, self.last_id + 1):
+                # user_id == user_id_2 cannot happen
+                # if friendship between user_id and user_id_2 already exists
+                #   don't add new one between user_id_2 and user_id
+                possible_friendships.append( (user_id, friend_id) )
+        
+        # Randomly select x friendships
+        # The formula for x is num_users * avg_friendships // 2
+        # Shuffle the array and pick x elements from the front of the array
+        random.shuffle(possible_friendships)
+        num_friendships = num_users * avg_friendships // 2
+        for i in range(0, num_friendships):
+            friendship = possible_friendships[i]
+            self.add_friendship(friendship[0], friendship[1])
 
     def get_all_social_paths(self, user_id):
         """
@@ -57,8 +78,9 @@ class SocialGraph:
 
         The key is the friend's ID and the value is the path.
         """
+        # use BFT that keeps track of the path
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        # dictionary should be like {2:[1, 2], 3:[1, 2, 3]}
         return visited
 
 
