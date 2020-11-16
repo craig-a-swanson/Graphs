@@ -48,8 +48,11 @@ Note that in this sample, Users 3, 4 and 9 are not in User 1's extended social n
 
 1. To create 100 users with an average of 10 friends each, how many times would you need to call `add_friendship()`? Why?
 
+    500 times.  If we needed to add 10 friends to each of the 100 users, we would think that we might need to call add_friendship() 1,000 times; however, the add_friendship() function does the work of adding the direction both ways. That is, it adds friendB to friendA and then also adds friendA to friendB.  So it would be called for total number of users, multiplied by average friends per user, and then divided by two.
+
 2. If you create 1000 users with an average of 5 random friends each, what percentage of other users will be in a particular user's extended social network? What is the average degree of separation between a user and those in his/her extended network?
 
+    
 
 
 ## 4. Stretch Goal
