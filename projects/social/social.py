@@ -1,4 +1,16 @@
 import random
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
 
 class User:
     def __init__(self, name):
@@ -81,6 +93,24 @@ class SocialGraph:
         # use BFT that keeps track of the path
         visited = {}  # Note that this is a dictionary, not a set
         # dictionary should be like {2:[1, 2], 3:[1, 2, 3]}
+        bfs_queue = Queue()
+        bfs_queue.enqueue([user_id])
+
+        while bfs_queue.size() > 0:
+            current_path = bfs_queue.dequeue()
+            current_node = current_path[-1]
+
+            if current_node not in visited:
+
+                if current_node != user_id:
+                    visited[current_node] = current_path
+
+                neighbors = self.friendships[current_node]
+
+                for neighbor in neighbors:
+                    next_path = list(current_path)
+                    next_path.append(neighbor)
+                    bfs_queue.enqueue(next_path)
         return visited
 
 
