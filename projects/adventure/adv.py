@@ -78,6 +78,7 @@ traversal_graph[player.current_room.id] = room_dict
 # Set up the traversal_graph entry for the new room
 # for a new room, each exit key is set to a value of '?'
 def new_room(from_id, direction):
+    traversal_path.append(direction)
     this_room = player.current_room
     last_room = this_room.id
     room_exits = this_room.get_exits()
@@ -98,7 +99,6 @@ def find_next_direction(room_id):
         if value == '?':
             travel_direction = exit
             next_location = player.current_room.get_room_in_direction(travel_direction)
-            traversal_path.append(travel_direction)
             traversal_graph[room_id][travel_direction] = next_location.id
             return travel_direction
 
