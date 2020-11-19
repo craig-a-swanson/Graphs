@@ -37,10 +37,10 @@ world = World()
 
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
-map_file = "maps/test_cross.txt"
+# map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -56,10 +56,6 @@ player = Player(world.starting_room)
 traversal_path = []
 
  # ------------------------------------------------
-
-dft_stack = Stack()
-bfs_queue = Queue()
-
 # store the graph in a dictionary with a format like:
 # {0: {'n':1, 's':'?', 'e':4, 'w':'?'}, 1: {'s': 0}}
 traversal_graph = {}
@@ -69,26 +65,28 @@ traversal_graph = {}
 # we just want to keep going down a path.
 dft_visited = set()
 
-last_room = 0
 # create a dictionary to easily flip the "to" direction and the "from" direction
 direction_swap = {'n':'s', 'e':'w', 's':'n', 'w':'e'}
 
-# Set up the traversal_graph entry for the new room
+# Function to set up the traversal_graph entry for the new room
 # for a new room, each exit key is set to a value of '?'
+# For an existing room, we just set room value of the direction we came from
+# e.g., if we arrived from room 7 and came from the east, we set 'e' to 7.
 def new_room(from_id, direction):
+    # The player just moved here, so append that move to the traversal_path
     traversal_path.append(direction)
     this_room = player.current_room
-    last_room = this_room.id
     room_exits = this_room.get_exits()
-    room_dict = {}
     if this_room.id not in traversal_graph:
+        room_dict = {}
         for exit in room_exits:
             room_dict[exit] = '?'
-    room_dict[direction_swap[direction]] = from_id
-    traversal_graph[this_room.id] = room_dict
+        traversal_graph[this_room.id] = room_dict
+    # set the value for the direction we arrived here from
+    traversal_graph[this_room.id][direction_swap[direction]] = from_id
 
 
-# Find next exit to take
+# Function to find next exit to take given a room_id
 # Loop through the room's exits and take the first '?'
 def find_next_direction(room_id):
     room_exits = traversal_graph[room_id]
@@ -100,42 +98,48 @@ def find_next_direction(room_id):
             traversal_graph[room_id][travel_direction] = next_location.id
             return travel_direction
 
+# Function using BFS that takes a room and finds the nearest '?' in exit values
 def backtrack_to_unexplored(current_room):
-    # This is the BFS part where we are searching for the first '?'
     # The idea is to first create the path to the room with a '?'
     # Then use that path to move the player back to that room.
     # Append the path onto the traversal_path array.
-    # Reset the dft_visited array (CHANGE: Do this in calling code block)
-    # Finally, pass the new room_id back to the calling statement
+    # Reset the dft_visited array (CHANGE: Do this at the caller)
+    # Finally, pass the new room back to the calling statement
     # If it doesn't find any more '?' then False is passed and it's done
 
 
     # the bfs_visited will be a set of room_id
     # the search is looking for a '?' in a dict value
     # but the visited set needs only to keep track of the nodes visited during the search
+    bfs_queue = Queue()
     bfs_visited = set()
     temp_path = []
 
+    # each queue entry contains a tuple with the current room and the path used to get to the room
     bfs_queue.enqueue((current_room, temp_path))
 
     while bfs_queue.size() > 0:
         dequeued_tuple = bfs_queue.dequeue()
+        # the room is the first element of the tuple
         current_room = dequeued_tuple[0]
         current_id = current_room.id
+        # the path is the second element of the tuple
         current_path = list(dequeued_tuple[1])
 
         if current_id not in bfs_visited:
             bfs_visited.add(current_id)
 
             # check the graph of the current room_id
-            # iterate through the exit values
             # if any values contain '?' then this is the path we want
-            # otherwise continue to neighboring room
+            # else, iterate through the exit values and enqueue
             exits = traversal_graph[current_id]
             if '?' in exits.values():
+                # iterate through each player movement needed to reach the room with a '?'
                 for direction in current_path:
                     player.travel(direction)
+                    # append the path to the existing traversal_path
                     traversal_path.append(direction)
+                # the player is now in the correct room, so return it to the caller.
                 return current_room
             for direction, room in exits.items():
                 new_path = list(current_path)
@@ -146,13 +150,16 @@ def backtrack_to_unexplored(current_room):
     return False
 
 
+#Instantiate a stack for the depth-first traversal
+dft_stack = Stack()
+
 # first room set-up
+# create the graph entry for room 0 with a '?' at each exit
 room_exits = player.current_room.get_exits()
 room_dict = {}
 for exit in room_exits:
     room_dict[exit] = '?'
 traversal_graph[player.current_room.id] = room_dict
-
 dft_stack.push(player.current_room.id)
 
 while dft_stack.size() > 0:
@@ -161,31 +168,24 @@ while dft_stack.size() > 0:
     if current_id not in dft_visited:
         dft_visited.add(current_id)
     
-        print(f'current dft_visited size: {dft_visited}')
-        print(traversal_graph)
         # pick a neighbor (an exit with a '?')
+        # if such an exit exists, push its room_id on the stack, move the player there
+        # and call the function to set-up that room
         next_exit = find_next_direction(current_id)
         if next_exit:
             dft_stack.push(player.current_room.get_room_in_direction(next_exit).id)
             player.travel(next_exit)
             new_room(current_id, next_exit)
 
-        # when there are no exits with a '?', then call bfs to backtrack to first unexplored exit
-        else:
-            backtrack_location = backtrack_to_unexplored(player.current_room)
-            if backtrack_location:
-                dft_stack.push(backtrack_location.id)
-                dft_visited = set()
-
-
-
-# travel_direction = find_next_direction(player.current_room.id)
-# player.travel(travel_direction)
-# new_room(last_room,travel_direction)
-# print(player.current_room.get_exits())
-print(traversal_graph)
-print(traversal_path)
-
+    # the following block is run when there are no unexplored exits in our room, or
+    # we have reached a room we have seen before (possibly in a loop).
+    # the backtrack_to_unexplored function is called.
+    # if that returns a room, we push that room_id onto the stack and continue
+    # else, we're done.
+    backtrack_location = backtrack_to_unexplored(player.current_room)
+    if backtrack_location:
+        dft_stack.push(backtrack_location.id)
+        dft_visited = set()
 
 
  # ------------------------------------------------
